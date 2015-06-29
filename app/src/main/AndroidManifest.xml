@@ -3,8 +3,18 @@
     package="com.example.lmasiello.torchfordummy" >
     <uses-permission android:name="android.permission.FLASHLIGHT"/>
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-feature android:name="android.hardware.Camera"/>
     <uses-feature android:name="android.hardware.camera2.full"/>
+    <uses-feature android:name="android.hardware.camera2.CameraDevice"/>
+    <uses-feature android:name="android.hardware.camera2.TotalCaptureResult"/>
+    <uses-feature android:name="android.hardware.camera2.CameraAccessException"/>
+    <uses-feature android:name="android.hardware.camera2.CameraCaptureSession"/>
+    <uses-feature android:name="android.hardware.camera2.CameraCharacteristics"/>
+    <uses-feature android:name="android.hardware.camera2.CameraManager"/>
+    <uses-feature android:name="android.hardware.camera2.CameraMetadata"/>
+    <uses-feature android:name="android.hardware.camera2.CaptureFailure"/>
+    <uses-feature android:name="android.hardware.camera2.CaptureRequest"/>
+    <uses-feature android:name="android.hardware.camera2.CaptureResult"/>
+    <uses-feature android:name="android.hardware.camera2.DngCreator"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"

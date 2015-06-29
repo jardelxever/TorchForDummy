@@ -80,7 +80,7 @@ public class Flash extends ActionBarActivity {
             }else{
                 Toast.makeText(Flash.this, "Flash is not available", Toast.LENGTH_SHORT).show();
             }
-            //mCameraManager.openCamera("0", new MyCameraDeviceStateCallback(), null);
+            mCameraManager.openCamera("0", new MyCameraDeviceStateCallback(), null);
         } catch (CameraAccessException e){
             e.printStackTrace();
         }
@@ -92,7 +92,7 @@ public class Flash extends ActionBarActivity {
             mCameraDevice = camera;
             //get builder
             try {
-                mBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_MANUAL);
+                mBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 //flash on, default is on
                 mBuilder.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AF_MODE_AUTO);
                 mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
