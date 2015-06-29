@@ -10,8 +10,6 @@
         android:layout_height="wrap_content"
         android:text="Turn_On_Off"
         android:id="@+id/swTurnOnOff"
-        android:maxHeight="600dp"
-        android:maxLength="100"
         android:layout_marginBottom="122dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />

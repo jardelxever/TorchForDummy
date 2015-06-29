@@ -80,7 +80,7 @@ public class Flash extends ActionBarActivity {
             }else{
                 Toast.makeText(Flash.this, "Flash is not available", Toast.LENGTH_SHORT).show();
             }
-            mCameraManager.openCamera("0", new MyCameraDeviceStateCallback(), null);
+            //mCameraManager.openCamera("0", new MyCameraDeviceStateCallback(), null);
         } catch (CameraAccessException e){
             e.printStackTrace();
         }
