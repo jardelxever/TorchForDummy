@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:state_pressed="false">  //currently pressed turning the toggle on
+        <bitmap android:src="@drawable/switchon"/>
+    </item>
+    <item android:state_checked="true" android:state_pressed="true" > //currently pressed turning the toggle off
+        <bitmap android:src="@drawable/switchoff"/>
+    </item>
+    <item android:state_checked="false" android:state_pressed="true" > //currently pressed turning the toggle off
+        <bitmap android:src="@drawable/switchon"/>
+    </item>
+    <item android:state_checked="false" android:state_pressed="false"> //not pressed default checked state
+        <bitmap android:src="@drawable/switchoff"/>
+    </item> //default non-pressed non-checked
+</selector>
