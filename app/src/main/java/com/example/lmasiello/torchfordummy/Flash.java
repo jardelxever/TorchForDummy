@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -38,9 +39,44 @@ public class Flash extends ActionBarActivity {
         try {
             init();
             Switch flashSwitch = (Switch) findViewById(R.id.swTurnOnOff);
+            SeekBar seekbar = (SeekBar) findViewById(R.id.seekBar);
             //default of flash mode  is on
             flashSwitch.setChecked(true);
-            flashSwitch.setOnCheckedChangeListener(new MyCheckedChangeListener());
+            flashSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+                //@Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    Toast.makeText(Flash.this, "Seek bar changed", Toast.LENGTH_SHORT).show();
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,24 +197,6 @@ public class Flash extends ActionBarActivity {
         }
     }
 
-    class MyCheckedChangeListener implements CompoundButton.OnCheckedChangeListener {
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            try {
-                if (isChecked) {
-                    mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
-                    mSession.setRepeatingRequest(mBuilder.build(), null, null);
-                } else {
-                    mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
-                    mSession.setRepeatingRequest(mBuilder.build(), null, null);
-                }
-            } catch (CameraAccessException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void close() {
         if (mCameraDevice == null || mSession == null) {
             return;
@@ -187,6 +205,62 @@ public class Flash extends ActionBarActivity {
         mCameraDevice.close();
         mCameraDevice = null;
         mSession = null;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        close();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setContentView(R.layout.activity_flash);
+        try {
+            init();
+            Switch flashSwitch = (Switch) findViewById(R.id.swTurnOnOff);
+            SeekBar seekbar = (SeekBar) findViewById(R.id.seekBar);
+            //default of flash mode  is on
+            flashSwitch.setChecked(true);
+            flashSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+                //@Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    Toast.makeText(Flash.this, "Seek bar changed", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
