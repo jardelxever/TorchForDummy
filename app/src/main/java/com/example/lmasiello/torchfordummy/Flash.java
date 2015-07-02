@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Flash extends ActionBarActivity {
@@ -32,7 +34,7 @@ public class Flash extends ActionBarActivity {
     private SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
 
-    @Override
+    /*@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash);
@@ -81,11 +83,7 @@ public class Flash extends ActionBarActivity {
             e.printStackTrace();
         }
 
-    }
-
-
-
-
+    }*/
 
     //@Override
     //public boolean onCreateOptionsMenu(Menu menu) {
@@ -220,10 +218,10 @@ public class Flash extends ActionBarActivity {
         try {
             init();
             Switch flashSwitch = (Switch) findViewById(R.id.swTurnOnOff);
-            SeekBar seekbar = (SeekBar) findViewById(R.id.seekBar);
+            final SeekBar seekbar = (SeekBar) findViewById(R.id.seekBar);
             //default of flash mode  is on
             flashSwitch.setChecked(true);
-            flashSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            flashSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 //@Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
@@ -243,7 +241,11 @@ public class Flash extends ActionBarActivity {
                     }
                 }
             });
+            seekbar.setMax(1500);
             seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                int progress_value = 0;
+                flashingTorch taskFlash;
+                Timer timerFlash;
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
 
@@ -251,11 +253,28 @@ public class Flash extends ActionBarActivity {
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-
+                    if (taskFlash == null && timerFlash == null) {
+                        taskFlash = new flashingTorch();
+                        timerFlash = new Timer();
+                        timerFlash.schedule(taskFlash, 0, progress_value);
+                    } else {
+                        timerFlash.cancel();
+                        timerFlash.purge();
+                        timerFlash = new Timer();
+                        taskFlash = new flashingTorch();
+                        timerFlash.schedule(taskFlash, 0, progress_value);
+                    }
+                    Toast.makeText(Flash.this, progress_value + "/" + seekbar.getMax(), Toast.LENGTH_SHORT).show();
                 }
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    Toast.makeText(Flash.this, "Seek bar changed", Toast.LENGTH_SHORT).show();
+                    if (progress >= 1450 ){
+                        progress = 1450;
+                    } else if (progress == 0 ){
+                        progress = 1500;
+                    }
+
+                    progress_value = 1500 - progress;
                 }
             });
         } catch (Exception e) {
@@ -267,6 +286,32 @@ public class Flash extends ActionBarActivity {
     protected void onDestroy() {
         super.onDestroy();
         close();
+        Toast.makeText(Flash.this, "Seek bar changed", Toast.LENGTH_SHORT).cancel();
     }
+    public class flashingTorch extends TimerTask {
+        boolean blTorch = true;
+        @Override
+        public void run() {
+
+            if (blTorch ==true){
+                mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+                try {
+                    mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
+                blTorch = false;
+            }else{
+                mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+                try {
+                    mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
+                blTorch = true;
+            }
+        }
+    }
+
 }
 
