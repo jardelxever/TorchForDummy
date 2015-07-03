@@ -27,4 +27,13 @@
         android:id="@+id/seekBar"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"/>
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/swMorse"
+        android:layout_alignBottom="@+id/swTurnOnOff"
+        android:layout_toRightOf="@+id/swTurnOnOff"
+        android:layout_toEndOf="@+id/swTurnOnOff"
+        android:checked="false" />
 </RelativeLayout>

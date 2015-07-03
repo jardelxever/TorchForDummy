@@ -10,10 +10,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Size;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -36,6 +33,9 @@ public class Flash extends ActionBarActivity {
     private Surface mSurface;
     private flashingTorch taskFlash;
     private Timer timerFlash;
+    private MorseTorch taskMorse;
+    private Timer timerMorse;
+
     /*@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,15 +225,35 @@ public class Flash extends ActionBarActivity {
         super.onResume();
         setContentView(R.layout.activity_flash);
         try {
+
             init();
-            Switch flashSwitch = (Switch) findViewById(R.id.swTurnOnOff);
+            final Switch flashSwitch = (Switch) findViewById(R.id.swTurnOnOff);
+            final Switch morseSwitch = (Switch) findViewById(R.id.swMorse);
             final SeekBar seekbar = (SeekBar) findViewById(R.id.seekBar);
             //default of flash mode  is on
+            morseSwitch.setChecked(false);
+            morseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    if (isChecked) {
+                        flashSwitch.setEnabled(false);
+                        taskMorse = new MorseTorch();
+                        timerMorse = new Timer();
+                        timerMorse.schedule(taskMorse,0,200);
+                    } else {
+                        flashSwitch.setEnabled(true);
+                        taskMorse.cancel();
+                        timerMorse.cancel();
+                        timerMorse.purge();
+                    }
+                }
+            });
             flashSwitch.setChecked(false);
             flashSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 //@Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
+                        morseSwitch.setEnabled(false);
                         seekbar.setProgress(0);
                         seekbar.setVisibility(View.VISIBLE);
                         mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
@@ -243,6 +263,7 @@ public class Flash extends ActionBarActivity {
                             e.printStackTrace();
                         }
                     } else {
+                        morseSwitch.setEnabled(true);
                         if (timerFlash != null && taskFlash != null) {
                             timerFlash.cancel();
                             timerFlash.purge();
@@ -352,6 +373,71 @@ public class Flash extends ActionBarActivity {
             }
         }
     }
+    public class MorseTorch extends TimerTask {
+        long oldTime = 0;
+        long delta = 0;
+        int index = 0;
+        String ciao= "ciao danilo";
 
+        @Override
+        public void run() {
+            Util util = new Util();
+            if (((oldTime - System.currentTimeMillis())> delta) && (index <= ciao.length() -1)) {
+                ciao = util.ReturnMorseString(ciao);
+                switch (ciao.charAt(index)) {
+                    case '.':
+                        oldTime = System.currentTimeMillis();
+                        delta = 1000;
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                        index++;
+                    case '-':
+                        oldTime = System.currentTimeMillis();
+                        delta = 3000;
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                        index++;
+                    case '?':
+                        oldTime = System.currentTimeMillis();
+                        delta = 7000;
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                        index++;
+                    case '#':
+                        oldTime = System.currentTimeMillis();
+                        delta = 1000;
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                        index++;
+                    case '_':
+                        oldTime = System.currentTimeMillis();
+                        delta = 3000;
+                        mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+                        try {
+                            mSession.setRepeatingRequest(mBuilder.build(), null, null);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                        index++;
+                }
+            }
+        }
+    }
 }
 
