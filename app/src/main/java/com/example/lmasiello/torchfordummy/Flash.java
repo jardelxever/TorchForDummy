@@ -9,6 +9,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
+import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Size;
 import android.view.Surface;
@@ -34,7 +35,7 @@ public class Flash extends ActionBarActivity {
     private flashingTorch taskFlash;
     private Timer timerFlash;
     private MorseTorch taskMorse;
-    private Timer timerMorse;
+    private Thread threadMorse;
 
     /*@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -238,13 +239,14 @@ public class Flash extends ActionBarActivity {
                     if (isChecked) {
                         flashSwitch.setEnabled(false);
                         taskMorse = new MorseTorch();
-                        timerMorse = new Timer();
-                        timerMorse.schedule(taskMorse,0,200);
+                        threadMorse = new Thread(new MorseTorch());
+                        threadMorse.setPriority(Thread.MAX_PRIORITY);
+                        threadMorse.setDaemon(true);
+                        threadMorse.start();
                     } else {
                         flashSwitch.setEnabled(true);
-                        taskMorse.cancel();
-                        timerMorse.cancel();
-                        timerMorse.purge();
+                        taskMorse = null;
+                        threadMorse.interrupt();
                     }
                 }
             });
@@ -373,69 +375,64 @@ public class Flash extends ActionBarActivity {
             }
         }
     }
-    public class MorseTorch extends TimerTask {
-        long oldTime = 0;
-        long delta = 0;
+    public class MorseTorch implements Runnable{
         int index = 0;
         String ciao= "ciao danilo";
 
         @Override
         public void run() {
             Util util = new Util();
-            if (((oldTime - System.currentTimeMillis())> delta) && (index <= ciao.length() -1)) {
-                ciao = util.ReturnMorseString(ciao);
+            ciao = ciao.trim();
+            ciao = util.ReturnMorseString(ciao);
+            while (ciao != ""){
                 switch (ciao.charAt(index)) {
                     case '.':
-                        oldTime = System.currentTimeMillis();
-                        delta = 1000;
                         mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
                         try {
                             mSession.setRepeatingRequest(mBuilder.build(), null, null);
                         } catch (CameraAccessException e) {
                             e.printStackTrace();
                         }
+                        SystemClock.sleep(500);
                         index++;
                     case '-':
-                        oldTime = System.currentTimeMillis();
-                        delta = 3000;
                         mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
                         try {
                             mSession.setRepeatingRequest(mBuilder.build(), null, null);
                         } catch (CameraAccessException e) {
                             e.printStackTrace();
                         }
+                        SystemClock.sleep(1500);
                         index++;
                     case '?':
-                        oldTime = System.currentTimeMillis();
-                        delta = 7000;
                         mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
                         try {
                             mSession.setRepeatingRequest(mBuilder.build(), null, null);
                         } catch (CameraAccessException e) {
                             e.printStackTrace();
                         }
+                        SystemClock.sleep(3500);
                         index++;
                     case '#':
-                        oldTime = System.currentTimeMillis();
-                        delta = 1000;
                         mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
                         try {
                             mSession.setRepeatingRequest(mBuilder.build(), null, null);
                         } catch (CameraAccessException e) {
                             e.printStackTrace();
                         }
+                        SystemClock.sleep(500);
                         index++;
                     case '_':
-                        oldTime = System.currentTimeMillis();
-                        delta = 3000;
                         mBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
                         try {
                             mSession.setRepeatingRequest(mBuilder.build(), null, null);
                         } catch (CameraAccessException e) {
                             e.printStackTrace();
                         }
+                        SystemClock.sleep(1500);
                         index++;
                 }
+                ciao = ciao.substring(1);
             }
         }
     }
